@@ -20,6 +20,14 @@ public interface EmployeeMapper {
     Employee getByUsername(String username);
 
     /**
+     * 根据id查询员工
+     * @param id
+     * @return
+     */
+    @Select("select * from employee where id = #{id}")
+    Employee getById(Long id);
+
+    /**
      * 插入员工数据
      * @param employee
      */
@@ -32,4 +40,10 @@ public interface EmployeeMapper {
      * @return
      */
     Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    /**
+     * 通用的属性更新方法 （在mapper的xml映射文件中通过动态sql完成）
+     * @param employee
+     */
+    void update(Employee employee);
 }

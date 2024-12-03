@@ -74,7 +74,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     }
 
 
-
+    /**
+     * 扩展消息转换器（格式化返回json中的日期时间格式）
+     * @param converters
+     */
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters){
         log.info("扩展消息转换器...");
         //创建一个消息转换器对象

@@ -101,6 +101,42 @@ public class EmployeeServiceImpl implements EmployeeService {
         return result;
     }
 
+    /**
+     * 启用/禁用员工账号 （状态1启用，0禁用）
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, Long id){
+        Employee employee = Employee.builder()
+                .id(id).status(status)
+                .build();
 
+        employeeMapper.update(employee);
+    }
 
+    /**
+     * 根据id查询员工信息
+     * @param id
+     * @return
+     */
+    public Employee getById(Long id){
+        Employee employee = employeeMapper.getById(id);
+//        加强安全性，不传输密码给前端
+        employee.setPassword("******");
+        return employee;
+    }
+
+    /**
+     * 修改员工信息
+     * @param employeeDTO
+     */
+    public void update(EmployeeDTO employeeDTO){
+        Employee employee = new Employee();
+        // 拷贝DTO中需要修改的属性，调用mapper中通用的update方法
+        BeanUtils.copyProperties(employeeDTO, employee);
+        // 需要设置编辑信息，将编辑时间和编辑用户设置为实际情况
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
+    }
 }
