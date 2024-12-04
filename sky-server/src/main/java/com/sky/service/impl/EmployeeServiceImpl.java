@@ -80,10 +80,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setStatus(StatusConstant.ENABLE);
         // 密码默认为123456，使用MD5加密
         employee.setPassword(DigestUtils.md5Hex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
 
         // 插入数据库
         employeeMapper.insert(employee);
@@ -134,9 +130,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = new Employee();
         // 拷贝DTO中需要修改的属性，调用mapper中通用的update方法
         BeanUtils.copyProperties(employeeDTO, employee);
-        // 需要设置编辑信息，将编辑时间和编辑用户设置为实际情况
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+
         employeeMapper.update(employee);
     }
 }
