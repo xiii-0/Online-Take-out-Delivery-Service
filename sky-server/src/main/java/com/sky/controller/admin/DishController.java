@@ -51,6 +51,11 @@ public class DishController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 根据id批量删除菜品
+     * @param ids
+     * @return
+     */
     @DeleteMapping
     @ApiOperation("批量删除菜品")
     public Result delete(@RequestParam List<Long> ids){

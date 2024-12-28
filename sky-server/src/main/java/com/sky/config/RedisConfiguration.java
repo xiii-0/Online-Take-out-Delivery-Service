@@ -20,7 +20,6 @@ public class RedisConfiguration {
         redisTemplate.setConnectionFactory(redisConnectionFactory);
         // 设置redis key序列化器
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
 
         return redisTemplate;
     }
