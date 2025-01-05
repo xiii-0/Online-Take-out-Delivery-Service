@@ -20,7 +20,7 @@ public class ShopController {
      * 查询店铺状态
      * @return
      */
-    @GetMapping
+    @GetMapping("/status")
     @ApiOperation("查询店铺状态")
     public Result<Integer> getStatus(){
         log.info("查询店铺状态");
