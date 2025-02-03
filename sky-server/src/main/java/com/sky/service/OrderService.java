@@ -35,4 +35,10 @@ public interface OrderService {
      * @return
      */
     PageResult page(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 用户催单
+     * @param id
+     */
+    void remind(Long id);
 }

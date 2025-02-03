@@ -7,6 +7,9 @@ import com.sky.vo.OrderVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+
 @Mapper
 public interface OrderMapper {
     /**
@@ -23,6 +26,14 @@ public interface OrderMapper {
     Orders getByNumber(String orderNumber);
 
     /**
+     * 根据id查询订单
+     * @param id
+     * @return
+     */
+    @Select("select * from orders where id = #{id}")
+    Orders getById(Long id);
+
+    /**
      * 修改订单信息
      * @param orders
      */
@@ -34,4 +45,10 @@ public interface OrderMapper {
      * @return
      */
     Page<Orders> pageQuery(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 更改订单状态（特定状态，特定时间范围内的订单）
+     * @param map
+     */
+    void updateOrderStatus(HashMap<String, Object> map);
 }

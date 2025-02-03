@@ -44,6 +44,38 @@
         where id = #{id}
     </update>
 
+
+    <update id="updateOrderStatus" parameterType="hashmap">
+        update orders
+        <set>
+            <if test="order.cancelReason != null and cancelReason!='' ">
+                cancel_reason=#{order.cancelReason},
+            </if>
+            <if test="order.rejectionReason != null and rejectionReason!='' ">
+                rejection_reason=#{order.rejectionReason},
+            </if>
+            <if test="order.cancelTime != null">
+                cancel_time=#{order.cancelTime},
+            </if>
+            <if test="order.payStatus != null">
+                pay_status=#{order.payStatus},
+            </if>
+            <if test="order.payMethod != null">
+                pay_method=#{order.payMethod},
+            </if>
+            <if test="order.checkoutTime != null">
+                checkout_time=#{order.checkoutTime},
+            </if>
+            <if test="order.status != null">
+                status = #{order.status},
+            </if>
+            <if test="order.deliveryTime != null">
+                delivery_time = #{order.deliveryTime}
+            </if>
+        </set>
+        where status = #{status} and order_time &lt; #{time}
+    </update>
+
     <select id="pageQuery" resultType="com.sky.entity.Orders">
         select * from orders
         <where>

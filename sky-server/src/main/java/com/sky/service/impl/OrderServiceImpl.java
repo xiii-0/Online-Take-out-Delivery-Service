@@ -1,9 +1,11 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.dto.OrdersPaymentDTO;
@@ -19,6 +21,7 @@ import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -45,6 +47,8 @@ public class OrderServiceImpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户提交订单
@@ -167,6 +171,15 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        // 使用websocket向管理端的前端页面推送支付成功（来单）消息
+        Map map = new HashMap();
+        map.put("type", 1); // 1标识该消息类型为来单提醒
+        map.put("orderId", ordersDB.getId());
+        map.put("content", "订单号" + outTradeNo);
+        String jsonResponse = JSON.toJSONString(map);
+
+        webSocketServer.sendToAllClient(jsonResponse);
     }
 
 
@@ -200,5 +213,27 @@ public class OrderServiceImpl implements OrderService {
 
         PageResult result = new PageResult(page.getTotal(), list);
         return result;
+    }
+
+    /**
+     * 用户催单
+     * @param id
+     */
+    public void remind(Long id){
+        Orders order = orderMapper.getById(id);
+        if (order == null){
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        else if (!Objects.equals(order.getStatus(), Orders.TO_BE_CONFIRMED)){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        // 使用websocket向管理端的前端页面推送催单消息
+        Map map = new HashMap();
+        map.put("type", 2); // 2标识该消息类型为客户催单提醒
+        map.put("orderId", id);
+        map.put("content", "订单号" + order.getNumber());
+        String jsonResponse = JSON.toJSONString(map);
+
+        webSocketServer.sendToAllClient(jsonResponse);
     }
 }
