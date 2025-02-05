@@ -23,6 +23,7 @@ import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -196,22 +197,36 @@ public class OrderServiceImpl implements OrderService {
         PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
         Page<Orders> page = orderMapper.pageQuery(ordersPageQueryDTO);
 
-        List<OrderVO> list = new ArrayList<>();
+        List<OrderVO> voList = new ArrayList<>();
 
         // 再对于每一个订单，查询菜品详情并构造vo
         if (page != null && page.getTotal() > 0){
+            // 获取用户所有订单的所有详情 (避免循环查询数据库)
+            List<OrderDetail> details = orderDetailMapper.getByOrders(page);
+            Map<Long, List> map = new HashMap<>();
+            // 生成每个订单的对应详情，在map中存储，key为order id
+            for (OrderDetail detail: details){
+                Long id = detail.getOrderId();
+                if (map.containsKey(id)){
+                    map.get(id).add(detail);
+                }else{
+                    List<OrderDetail> list = new ArrayList<>();
+                    list.add(detail);
+                    map.put(id, list);
+                }
+            }
             for (Orders order: page){
                 Long id = order.getId();
-                List<OrderDetail> details = orderDetailMapper.getByOrderId(id);
                 OrderVO vo = new OrderVO();
                 BeanUtils.copyProperties(order, vo);
-                vo.setOrderDetailList(details);
-                list.add(vo);
+                // 在order vo中，从map里获取order对应的详情加入vo
+                vo.setOrderDetailList(map.get(id));
+                voList.add(vo);
             }
         }
 
 
-        PageResult result = new PageResult(page.getTotal(), list);
+        PageResult result = new PageResult(page.getTotal(), voList);
         return result;
     }
 

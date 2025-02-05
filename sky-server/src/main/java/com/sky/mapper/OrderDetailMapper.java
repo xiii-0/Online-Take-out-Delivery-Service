@@ -1,6 +1,8 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
 import com.sky.entity.OrderDetail;
+import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -21,4 +23,11 @@ public interface OrderDetailMapper {
      */
     @Select("select * from order_detail where order_id = #{orderId};")
     List<OrderDetail> getByOrderId(Long orderId);
+
+    /**
+     * 获取多个订单中的菜品详情
+     * @param page
+     * @return
+     */
+    List<OrderDetail> getByOrders(List<Orders> page);
 }

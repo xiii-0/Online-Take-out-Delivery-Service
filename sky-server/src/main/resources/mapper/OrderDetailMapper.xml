@@ -13,4 +13,13 @@
         </foreach>
     </insert>
 
+    <select id="getByOrders" parameterType="list" resultType="com.sky.entity.OrderDetail">
+        SELECT *
+        FROM order_detail
+        WHERE order_id IN
+        <foreach item="order" collection="page" open="(" separator="," close=")">
+            #{order.id}
+        </foreach>
+    </select>
+
 </mapper>
