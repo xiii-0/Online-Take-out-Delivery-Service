@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class ShopServiceImpl implements ShopService {
-    public static final String key = "SHOP_STATUS";
+    public static final String key = "sky:SHOP_STATUS";
     @Autowired
     private RedisTemplate redisTemplate;
     /**
@@ -27,6 +27,10 @@ public class ShopServiceImpl implements ShopService {
      */
     public Integer getStatus(){
         Integer status = (Integer) redisTemplate.opsForValue().get(key);
+        if (status == null){ // 如果redis中没有，则设置为0 (打烊中)
+            status = 0;
+            setStatus(status);
+        }
         return status;
     }
 }

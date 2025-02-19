@@ -161,7 +161,7 @@ public class DishServiceImpl implements DishService {
      */
     public List<DishVO> listWithFlavor(Dish dish) {
         // 查询该分类下的菜品是否已经缓存
-        String key = "cat_" + dish.getCategoryId();
+        String key = "sky:dishes:cat_" + dish.getCategoryId();
         List<DishVO> dishVOList = (List<DishVO>) redisTemplate.opsForValue().get(key);
         if (dishVOList != null && dishVOList.size() != 0) {
             return dishVOList;
@@ -209,7 +209,7 @@ public class DishServiceImpl implements DishService {
         if (id != null){
             // 根据菜品ID查分类ID
             Dish dish = dishMapper.getById(id);
-            String key = "cat_" + dish.getCategoryId();
+            String key = "sky:dishes:cat_" + dish.getCategoryId();
             redisTemplate.delete(key);
         }else{
             clearCache();
@@ -222,7 +222,7 @@ public class DishServiceImpl implements DishService {
      */
     private void clearCache(){
         log.info("清除全部菜品缓存");
-        Set<Long> keys = redisTemplate.keys("cat_*");
+        Set<Long> keys = redisTemplate.keys("sky:dishes:cat_*");
         redisTemplate.delete(keys);
     }
 }
